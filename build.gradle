@@ -1,0 +1,59 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    def selenium_version = '3.141.59'
+    def selenide_version = '5.12.2'
+    def open_csv_version = '5.2'
+    def junit_version = '4.12'
+    def truth_version = '1.0.1'
+    def guava_version = '29.0-jre'
+    def cucumber_version = '6.7.0'
+
+    // TODO zrobic ladnie
+    def versions = [
+        lombok      :   '1.18.16'
+
+    ]
+
+    // Lombok
+    compileOnly "org.projectlombok:lombok:$versions.lombok"
+    annotationProcessor "org.projectlombok:lombok:$versions.lombok"
+    testCompileOnly 'org.projectlombok:lombok:1.18.16'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+    // Open CSV
+    compile group: 'com.opencsv', name: 'opencsv', version: '5.2'
+
+    // Testing
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.141.59'
+    compile group: 'com.codeborne', name: 'selenide', version: '5.12.2'
+
+    // Cucumber
+    testImplementation "io.cucumber:cucumber-java:$cucumber_version"
+    testImplementation "io.cucumber:cucumber-junit:$cucumber_version"
+
+    // Google Truth
+    testImplementation "com.google.truth:truth:1.0.1"
+    implementation("com.google.guava:guava:29.0-jre")
+}
+
+task cucumber() {
+    dependsOn assemble, compileTestJava
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/test/resources']
+        }
+    }
+}
